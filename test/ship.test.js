@@ -1,23 +1,29 @@
 import Ship from "../src/ship";
 
-test("ship is hit", () => {
-    const ship = new Ship(4);
-    ship.hit();
-    expect(ship.timesHit).toBe(1);
-
-    ship.hit();
-    expect(ship.timesHit).toBe(2);
+let ship;
+let ship2;
+beforeEach(() => {
+    ship = new Ship(4);
+    ship2 = new Ship(2);
 });
 
-test("ship is sunk", () => {
-    const ship = new Ship(4);
-    ship.hit();
-    ship.hit();
-    ship.hit();
-    ship.hit();
-    expect(ship.isSunk()).toBe(true);
+test("Ship is hit", () => {
+    ship.hit(0, 0);
+    expect(ship.timesHit).toBe(1);
+    expect(ship.isHit(0, 0)).toBe(true);
 
-    const ship2 = new Ship(2);
+    ship.hit(0, 1);
+    expect(ship.timesHit).toBe(2);
+    expect(ship.isHit(0, 1)).toBe(true);
+});
+
+test("Ship is sunk", () => {
+    ship.hit();
+    ship.hit();
+    ship.hit();
+    ship.hit();
+    expect(ship.isSunk).toBe(true);
+
     ship2.hit();
-    expect(ship2.isSunk()).toBe(false);
+    expect(ship2.isSunk).toBe(false);
 });
