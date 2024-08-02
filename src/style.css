@@ -1,0 +1,48 @@
+* {
+    box-sizing: border-box;
+}
+
+.game-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20vh;
+    /* width: 70vw; */
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-gap: 10px;
+    width: 300px;
+    height: 300px;
+}
+
+.board.player {
+    background-color: rgb(202, 202, 255);
+}
+
+.board.computer {
+    background-color: rgb(255, 146, 146);
+}
+
+.cell {
+    background-color: rgb(78, 94, 158);
+}
+
+.cell:hover {
+    background-color: rgb(41, 52, 99);
+    cursor: pointer;
+}
+
+.cell.ship {
+    background-color: black;
+}
+
+.cell.water.hit {
+    background-color: rgb(202, 74, 74);
+}
+
+.cell.ship.hit {
+    background-color: rgb(255, 0, 0);
+}

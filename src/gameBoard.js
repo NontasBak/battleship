@@ -18,7 +18,7 @@ class GameBoard {
     }
 
     placeShip(x, y, ship, direction) {
-        shipCanBePlaced = (x, y, length, direction) => {
+        const shipCanBePlaced = (x, y, length, direction) => {
             if (direction === "horizontal") {
                 if (this.board.length < y + length) return false;
                 for (let i = 0; i < length; i++)
