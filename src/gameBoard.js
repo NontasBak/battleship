@@ -17,7 +17,7 @@ class GameBoard {
         return board;
     }
 
-    placeShip(x, y, length, direction) {
+    placeShip(x, y, ship, direction) {
         shipCanBePlaced = (x, y, length, direction) => {
             if (direction === "horizontal") {
                 if (this.board.length < y + length) return false;
@@ -30,20 +30,19 @@ class GameBoard {
             }
             return true;
         };
-        if (!shipCanBePlaced(x, y, length, direction)) {
+        if (!shipCanBePlaced(x, y, ship.length, direction)) {
             throw new Error("Ship cannot be placed.");
         }
-        
-        const ship = new Ship(length);
+
         this.ships.push(ship);
         switch (direction) {
             case "horizontal":
-                for (let i = 0; i < length; i++) {
+                for (let i = 0; i < ship.length; i++) {
                     this.board[x][y + i].ship = ship;
                 }
                 break;
             case "vertical":
-                for (let i = 0; i < length; i++) {
+                for (let i = 0; i < ship.length; i++) {
                     this.board[x + i][y].ship = ship;
                 }
                 break;

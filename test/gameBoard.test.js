@@ -7,7 +7,8 @@ beforeEach(() => {
 });
 
 test("Gameboard should place ship horizontally", () => {
-    gameBoard.placeShip(0, 0, 4, "horizontal");
+    const ship = new Ship(4);
+    gameBoard.placeShip(0, 0, ship, "horizontal");
     expect(gameBoard.board[0][0].ship).toBeInstanceOf(Ship);
     expect(gameBoard.board[0][1].ship).toBeInstanceOf(Ship);
     expect(gameBoard.board[0][2].ship).toBeInstanceOf(Ship);
@@ -16,7 +17,8 @@ test("Gameboard should place ship horizontally", () => {
 });
 
 test("Gameboard should place ship vertically", () => {
-    gameBoard.placeShip(0, 0, 4, "vertical");
+    const ship = new Ship(4);
+    gameBoard.placeShip(0, 0, ship, "vertical");
     expect(gameBoard.board[0][0].ship).toBeInstanceOf(Ship);
     expect(gameBoard.board[1][0].ship).toBeInstanceOf(Ship);
     expect(gameBoard.board[2][0].ship).toBeInstanceOf(Ship);
@@ -25,19 +27,28 @@ test("Gameboard should place ship vertically", () => {
 });
 
 test("Gameboard should not place ship out of bounds", () => {
-    expect(() => gameBoard.placeShip(0, 9, 2, "horizontal")).toThrow(Error);
-    expect(() => gameBoard.placeShip(9, 0, 2, "vertical")).toThrow(Error);
+    const ship = new Ship(2);
+    expect(() => gameBoard.placeShip(0, 9, ship, "horizontal")).toThrow(Error);
+    expect(() => gameBoard.placeShip(9, 0, ship, "vertical")).toThrow(Error);
 });
 
 test("Gameboard should not place ship on top of another ship", () => {
-    gameBoard.placeShip(0, 0, 4, "horizontal");
-    expect(() => gameBoard.placeShip(0, 0, 2, "vertical")).toThrow(Error);
-    expect(() => gameBoard.placeShip(0, 0, 2, "horizontal")).toThrow(Error);
-    expect(() => gameBoard.placeShip(0, 3, 1, "horizontal")).toThrow(Error);
+    const ship = new Ship(4);
+    gameBoard.placeShip(0, 0, ship, "horizontal");
+    expect(() => gameBoard.placeShip(0, 0, new Ship(2), "vertical")).toThrow(
+        Error
+    );
+    expect(() => gameBoard.placeShip(0, 0, new Ship(2), "horizontal")).toThrow(
+        Error
+    );
+    expect(() => gameBoard.placeShip(0, 3, new Ship(1), "horizontal")).toThrow(
+        Error
+    );
 });
 
 test("Gameboard should receive attack with ship", () => {
-    gameBoard.placeShip(0, 0, 4, "horizontal");
+    const ship = new Ship(4);
+    gameBoard.placeShip(0, 0, ship, "horizontal");
     gameBoard.receiveAttack(0, 0);
     expect(gameBoard.board[0][0].hit).toBe(true);
     expect(gameBoard.board[0][1].hit).toBe(false);
@@ -64,12 +75,14 @@ test("Gameboard should keep track of missed attacks", () => {
 });
 
 test("Gameboard should report whether all of the ships are sunk", () => {
-    gameBoard.placeShip(0, 0, 2, "horizontal");
+    const ship = new Ship(2);
+    gameBoard.placeShip(0, 0, ship, "horizontal");
     gameBoard.receiveAttack(0, 0);
     gameBoard.receiveAttack(0, 1);
     expect(gameBoard.allShipsSunk()).toBe(true);
 
-    gameBoard.placeShip(5, 5, 2, "vertical");
+    const ship2 = new Ship(2);
+    gameBoard.placeShip(5, 5, ship2, "vertical");
     gameBoard.receiveAttack(5, 5);
     expect(gameBoard.allShipsSunk()).toBe(false);
 });
