@@ -17,20 +17,8 @@ class GameBoard {
         return board;
     }
 
-    placeShip(x, y, ship, direction) {
-        const shipCanBePlaced = (x, y, length, direction) => {
-            if (direction === "horizontal") {
-                if (this.board.length < y + length) return false;
-                for (let i = 0; i < length; i++)
-                    if (this.board[x][y + i].ship) return false;
-            } else if (direction === "vertical") {
-                if (this.board.length < x + length) return false;
-                for (let i = 0; i < length; i++)
-                    if (this.board[x + i][y].ship) return false;
-            }
-            return true;
-        };
-        if (!shipCanBePlaced(x, y, ship.length, direction)) {
+    placeShip(x, y, direction, ship) {
+        if (!this.canPlaceShip(x, y, direction, ship)) {
             throw new Error("Ship cannot be placed.");
         }
 
@@ -49,8 +37,13 @@ class GameBoard {
         }
     }
 
+    canReceiveAttack(x, y) {
+        return !this.board[x][y].hit;
+    }
+
     receiveAttack(x, y) {
-        if (this.board[x][y].hit) throw new Error("Spot is already hit");
+        if (!this.canReceiveAttack(x, y))
+            throw new Error("Spot is already hit");
         this.board[x][y].hit = true;
         if (this.board[x][y].ship) {
             this.board[x][y].ship.hit(x, y);
@@ -61,6 +54,42 @@ class GameBoard {
 
     allShipsSunk() {
         return this.ships.every((ship) => ship.isSunk);
+    }
+
+    canPlaceShip(x, y, direction, ship) {
+        if (direction === "horizontal") {
+            if (this.board.length < y + ship.length) return false;
+            for (let i = 0; i < ship.length; i++)
+                if (this.board[x][y + i].ship) return false;
+        } else if (direction === "vertical") {
+            if (this.board.length < x + ship.length) return false;
+            for (let i = 0; i < ship.length; i++)
+                if (this.board[x + i][y].ship) return false;
+        }
+        return true;
+    }
+
+    placeShipRandomly() {
+        const getRandomPosition = () => {
+            const randomX = Math.floor(Math.random() * 10);
+            const randomY = Math.floor(Math.random() * 10);
+            const randomDirection =
+                Math.random() < 0.5 ? "horizontal" : "vertical";
+            return [randomX, randomY, randomDirection];
+        };
+        const ship1 = new Ship(1);
+        const ship2 = new Ship(2);
+        const ship3 = new Ship(3);
+        const ship4 = new Ship(4);
+        this.ships.push(ship1, ship2, ship3, ship4);
+
+        this.ships.forEach((ship) => {
+            let randomPosition;
+            do {
+                randomPosition = getRandomPosition();
+            } while (!this.canPlaceShip(...randomPosition, ship));
+            this.placeShip(...randomPosition, ship);
+        });
     }
 }
 

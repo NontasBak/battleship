@@ -87,31 +87,18 @@ class Display {
                 isAlreadyhit = true;
                 continue;
             }
+            // if (!this.player.gameBoard.canReceiveAttack(...randomAttacks)) {
+            //     continue;
+            // }
             // console.log(randomAttacks);
             // console.log(playerBoard[randomAttacks[0]][randomAttacks[1]].ship);
             // console.log(playerBoard[randomAttacks[0]][randomAttacks[1]].hit);
-            this.player.gameBoard.receiveAttack(
-                randomAttacks[0],
-                randomAttacks[1]
-            );
+            this.player.gameBoard.receiveAttack(...randomAttacks);
             this.displayBoardPlayer();
         } while (
             playerBoard[randomAttacks[0]][randomAttacks[1]].ship ||
             isAlreadyhit
         );
-    }
-
-    placeShipsDeterministic(board) {
-        //Fixed values for now
-        const ship1 = new Ship(1);
-        const ship2 = new Ship(2);
-        const ship3 = new Ship(3);
-        const ship4 = new Ship(4);
-
-        board.placeShip(0, 0, ship1, "horizontal");
-        board.placeShip(1, 2, ship2, "vertical");
-        board.placeShip(2, 4, ship3, "horizontal");
-        board.placeShip(4, 6, ship4, "vertical");
     }
 }
 

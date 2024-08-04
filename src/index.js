@@ -7,7 +7,7 @@ const player = new Player("player");
 const computer = new Player("computer");
 const display = new Display(player, computer);
 
-display.placeShipsDeterministic(player.gameBoard);
-display.placeShipsDeterministic(computer.gameBoard);
+player.gameBoard.placeShipRandomly();
+computer.gameBoard.placeShipRandomly();
 display.displayBoardPlayer(player.gameBoard);
 display.displayBoardComputer(computer.gameBoard);
