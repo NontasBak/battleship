@@ -12,14 +12,18 @@ body {
     flex-direction: column;
     /* align-items: center; */
     justify-content: center;
+    /* margin: -3vw; */
+    /* height: 100vh; */
+
+    position: relative;
 }
 
 .header {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 4rem;
-    font-size: 2.5rem;
+    padding: 2rem;
+    font-size: calc(2.5rem + 1vw);
 }
 
 .game-container {
@@ -50,8 +54,8 @@ body {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
-    width: clamp(400px, 40vw, 800px);
-    height: clamp(400px, 40vw, 800px);
+    width: clamp(400px, 30vw, 800px);
+    height: clamp(400px, 30vw, 800px);
     border: 2px solid black;
 }
 
@@ -62,13 +66,14 @@ body {
 .computer .cell:hover {
     background-image: url("./icons/target.png");
     background-size: cover;
-    opacity: 0.8;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
     cursor: pointer;
 }
 
 .computer .cell.hit:hover {
     cursor: not-allowed;
-    opacity: 1;
 }
 
 .player .cell.ship {
@@ -97,4 +102,51 @@ body {
     background-size: 80%;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.restart-game-container {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    backdrop-filter: blur(2px);
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+
+    animation: fadeIn 0.5s;
+}
+
+.restart-game-container h2 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.restart-game-container button {
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    background-color: rgb(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+
+    transition: background-color 0.3s;
+}
+
+.restart-game-container button:hover {
+    background-color: rgb(0, 0, 0, 0.9);
 }

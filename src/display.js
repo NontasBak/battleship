@@ -72,8 +72,7 @@ class Display {
         this.computer.gameBoard.receiveAttack(x, y);
         this.displayBoardComputer();
         if (this.computer.gameBoard.allShipsSunk()) {
-            alert("Player wins");
-            this.finalizeGame();
+            this.finalizeGame("Player");
             return;
         }
 
@@ -107,8 +106,7 @@ class Display {
             this.player.gameBoard.receiveAttack(...randomAttacks);
             this.displayBoardPlayer();
             if (this.player.gameBoard.allShipsSunk()) {
-                alert("Computer wins");
-                this.finalizeGame();
+                this.finalizeGame("Computer");
                 break;
             }
         } while (
@@ -117,11 +115,24 @@ class Display {
         );
     }
 
-    finalizeGame() {
+    finalizeGame(winner) {
         const cells = document.querySelectorAll(".cell");
         cells.forEach((cell) => {
             cell.removeEventListener("click", this.cellClickHandler);
         });
+
+        const restartGameContainer = document.createElement("div");
+        restartGameContainer.classList.add("restart-game-container");
+        const winningMessage = document.createElement("h2");
+        winningMessage.textContent = `${winner} won!`;
+        const playAgainButton = document.createElement("button");
+        playAgainButton.textContent = "Play Again";
+        playAgainButton.addEventListener("click", () => {
+            window.location.reload();
+        });
+
+        restartGameContainer.append(winningMessage, playAgainButton);
+        document.body.appendChild(restartGameContainer);
     }
 }
 
