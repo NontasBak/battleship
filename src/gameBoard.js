@@ -127,10 +127,27 @@ class GameBoard {
             return [randomX, randomY, randomDirection];
         };
         const ship1 = new Ship(1);
-        const ship2 = new Ship(2);
-        const ship3 = new Ship(3);
-        const ship4 = new Ship(4);
-        this.ships.push(ship1, ship2, ship3, ship4);
+        const ship2 = new Ship(1);
+        const ship3 = new Ship(1);
+        const ship4 = new Ship(1);
+        const ship5 = new Ship(2);
+        const ship6 = new Ship(2);
+        const ship7 = new Ship(2);
+        const ship8 = new Ship(3);
+        const ship9 = new Ship(3);
+        const ship10 = new Ship(4);
+        this.ships.push(
+            ship1,
+            ship2,
+            ship3,
+            ship4,
+            ship5,
+            ship6,
+            ship7,
+            ship8,
+            ship9,
+            ship10
+        );
 
         this.ships.forEach((ship) => {
             let randomPosition;
