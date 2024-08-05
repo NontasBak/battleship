@@ -57,6 +57,7 @@ class GameBoard {
     }
 
     canPlaceShip(x, y, direction, ship) {
+        //Check if ship is out of bounds or on top of another ship
         if (direction === "horizontal") {
             if (this.board.length < y + ship.length) return false;
             for (let i = 0; i < ship.length; i++)
@@ -65,6 +66,54 @@ class GameBoard {
             if (this.board.length < x + ship.length) return false;
             for (let i = 0; i < ship.length; i++)
                 if (this.board[x + i][y].ship) return false;
+        }
+
+        //Check if ship is right next to another ship
+        if (direction === "horizontal") {
+            if (
+                (this.board[x][y - 1] && this.board[x][y - 1].ship) ||
+                (this.board[x][y + ship.length] &&
+                    this.board[x][y + ship.length].ship)
+            )
+                return false;
+            for (let i = -1; i < ship.length + 1; i++) {
+                if (
+                    this.board[x - 1] &&
+                    this.board[x - 1][y + i] &&
+                    this.board[x - 1][y + i].ship
+                )
+                    return false;
+                if (
+                    this.board[x + 1] &&
+                    this.board[x + 1][y + i] &&
+                    this.board[x + 1][y + i].ship
+                )
+                    return false;
+            }
+        } else if (direction === "vertical") {
+            if (
+                (this.board[x - 1] &&
+                    this.board[x - 1][y] &&
+                    this.board[x - 1][y].ship) ||
+                (this.board[x + ship.length] &&
+                    this.board[x + ship.length][y] &&
+                    this.board[x + ship.length][y].ship)
+            )
+                return false;
+            for (let i = -1; i < ship.length + 1; i++) {
+                if (
+                    this.board[x + i] &&
+                    this.board[x + i][y - 1] &&
+                    this.board[x + i][y - 1].ship
+                )
+                    return false;
+                if (
+                    this.board[x + i] &&
+                    this.board[x + i][y + 1] &&
+                    this.board[x + i][y + 1].ship
+                )
+                    return false;
+            }
         }
         return true;
     }
