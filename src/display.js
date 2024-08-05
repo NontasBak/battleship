@@ -23,6 +23,9 @@ class Display {
                 }
                 if (board[i][j].ship) {
                     cell.classList.add("ship");
+                    if (board[i][j].ship.isSunk) {
+                        cell.classList.add("sunk");
+                    }
                 } else {
                     cell.classList.add("water");
                 }
@@ -47,6 +50,9 @@ class Display {
                     cell.classList.add("hit");
                     if (board[i][j].ship) {
                         cell.classList.add("ship");
+                        if (board[i][j].ship.isSunk) {
+                            cell.classList.add("sunk");
+                        }
                     } else {
                         cell.classList.add("water");
                     }

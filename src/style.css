@@ -2,47 +2,96 @@
     box-sizing: border-box;
 }
 
+body {
+    font-family: "Roboto Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    justify-content: center;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem;
+    font-size: 2.5rem;
+}
+
 .game-container {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin-top: 20vh;
+    flex-wrap: wrap;
+    /* margin-top: 20vh; */
     /* width: 70vw; */
+}
+
+.player-container,
+.computer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* margin: 2rem; */
+}
+
+.player-container > h4,
+.computer-container > h4 {
+    padding: 1rem;
+    font-size: 1.5rem;
 }
 
 .board {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    grid-gap: 10px;
-    width: 300px;
-    height: 300px;
-}
-
-.board.player {
-    background-color: rgb(202, 202, 255);
-}
-
-.board.computer {
-    background-color: rgb(255, 146, 146);
+    grid-template-rows: repeat(10, 1fr);
+    width: clamp(400px, 40vw, 800px);
+    height: clamp(400px, 40vw, 800px);
+    border: 2px solid black;
 }
 
 .cell {
-    background-color: rgb(78, 94, 158);
+    border: 1px solid black;
 }
 
-.cell:hover {
-    background-color: rgb(41, 52, 99);
+.computer .cell:hover {
+    background-image: url("./icons/target.png");
+    background-size: cover;
+    opacity: 0.8;
     cursor: pointer;
 }
 
-.cell.ship {
-    background-color: black;
+.computer .cell.hit:hover {
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.player .cell.ship {
+    background-color: rgb(127, 186, 39);
 }
 
 .cell.water.hit {
-    background-color: rgb(202, 74, 74);
+    background-image: url("./icons/sea.png");
+    background-size: 120%;
+    background-position: fixed;
+    background-repeat: no-repeat;
 }
 
 .cell.ship.hit {
-    background-color: rgb(255, 0, 0);
+    border: 2px solid rgb(0, 67, 0);
+    background: url("./icons/fire.png"), greenyellow;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.cell.ship.hit.sunk {
+    border: 2px solid rgb(156, 8, 8);
+    background: url("./icons/fire.png"), rgb(255, 204, 204);
+    background-size: 100%;
+    background-repeat: no-repeat;
 }
