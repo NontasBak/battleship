@@ -65,6 +65,11 @@ class Display {
 
         this.computer.gameBoard.receiveAttack(x, y);
         this.displayBoardComputer();
+        if (this.computer.gameBoard.allShipsSunk()) {
+            alert("Player wins");
+            this.finalizeGame();
+            return;
+        }
 
         //If you hit a ship you get to play again
         if (computerBoard[x][y].ship) {
@@ -95,10 +100,22 @@ class Display {
             // console.log(playerBoard[randomAttacks[0]][randomAttacks[1]].hit);
             this.player.gameBoard.receiveAttack(...randomAttacks);
             this.displayBoardPlayer();
+            if (this.player.gameBoard.allShipsSunk()) {
+                alert("Computer wins");
+                this.finalizeGame();
+                break;
+            }
         } while (
             playerBoard[randomAttacks[0]][randomAttacks[1]].ship ||
             isAlreadyhit
         );
+    }
+
+    finalizeGame() {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach((cell) => {
+            cell.removeEventListener("click", this.cellClickHandler);
+        });
     }
 }
 
