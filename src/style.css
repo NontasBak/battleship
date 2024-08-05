@@ -73,25 +73,28 @@ body {
 
 .player .cell.ship {
     background-color: rgb(127, 186, 39);
+    /* border: 2px solid rgb(0, 79, 0); */
 }
 
 .cell.water.hit {
     background-image: url("./icons/sea.png");
     background-size: 120%;
-    background-position: fixed;
+    background-position: 0 10px;
     background-repeat: no-repeat;
 }
 
 .cell.ship.hit {
     border: 2px solid rgb(0, 67, 0);
     background: url("./icons/fire.png"), greenyellow;
-    background-size: 100%;
+    background-size: 80%;
+    background-position: center;
     background-repeat: no-repeat;
 }
 
 .cell.ship.hit.sunk {
     border: 2px solid rgb(156, 8, 8);
     background: url("./icons/fire.png"), rgb(255, 204, 204);
-    background-size: 100%;
+    background-size: 80%;
+    background-position: center;
     background-repeat: no-repeat;
 }
