@@ -126,6 +126,8 @@ class GameBoard {
                 Math.random() < 0.5 ? "horizontal" : "vertical";
             return [randomX, randomY, randomDirection];
         };
+        this.board = this.createBoard(10);
+        this.ships = [];
         const ship1 = new Ship(1);
         const ship2 = new Ship(1);
         const ship3 = new Ship(1);

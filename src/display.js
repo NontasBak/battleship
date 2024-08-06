@@ -1,4 +1,5 @@
 import Ship from "./ship";
+import GameBoard from "./gameBoard";
 
 class Display {
     constructor(player, computer) {
@@ -57,6 +58,20 @@ class Display {
                         cell.classList.add("water");
                     }
                 }
+                boardDiv.appendChild(cell);
+            }
+        }
+    }
+
+    displayBoardComputerEmpty() {
+        const board = this.computer.gameBoard.board;
+        const boardDiv = document.querySelector(`.board.computer`);
+        boardDiv.innerHTML = "";
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.classList.add("unclickable");
                 boardDiv.appendChild(cell);
             }
         }
@@ -128,11 +143,49 @@ class Display {
         const playAgainButton = document.createElement("button");
         playAgainButton.textContent = "Play Again";
         playAgainButton.addEventListener("click", () => {
-            window.location.reload();
+            // window.location.reload();
+            this.player.gameBoard = new GameBoard();
+            this.computer.gameBoard = new GameBoard();
+            this.player.gameBoard.placeShipRandomly();
+            this.computer.gameBoard.placeShipRandomly();
+            this.displayBoardPlayer();
+            this.startingScreen();
+            restartGameContainer.remove();
         });
 
         restartGameContainer.append(winningMessage, playAgainButton);
         document.body.appendChild(restartGameContainer);
+    }
+
+    startingScreen() {
+        this.player.gameBoard.placeShipRandomly();
+        this.computer.gameBoard.placeShipRandomly();
+        this.displayBoardPlayer();
+        this.displayBoardComputerEmpty();
+
+        const startGameContainer = document.createElement("div");
+        startGameContainer.classList.add("start-game-container");
+
+        const randomizeShipsButton = document.createElement("button");
+        randomizeShipsButton.classList.add("randomize-ships");
+        randomizeShipsButton.textContent = "Randomize Ships";
+        randomizeShipsButton.addEventListener("click", () => {
+            this.player.gameBoard.placeShipRandomly();
+            this.displayBoardPlayer();
+        });
+
+        const startGameButton = document.createElement("button");
+        startGameButton.classList.add("start");
+        startGameButton.textContent = "Start";
+        startGameButton.addEventListener("click", () => {
+            this.displayBoardComputer();
+            // startGameContainer.style.display = "none";
+            startGameContainer.remove();
+        });
+
+        const computerContainer = document.querySelector(".computer-container");
+        startGameContainer.append(randomizeShipsButton, startGameButton);
+        computerContainer.appendChild(startGameContainer);
     }
 }
 

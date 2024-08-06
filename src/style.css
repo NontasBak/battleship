@@ -41,6 +41,7 @@ body {
     flex-direction: column;
     align-items: center;
 
+    position: relative;
     /* margin: 2rem; */
 }
 
@@ -149,4 +150,34 @@ body {
 
 .restart-game-container button:hover {
     background-color: rgb(0, 0, 0, 0.9);
+}
+
+.start-game-container {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    backdrop-filter: blur(2px);
+    width: 101%;
+    height: 101%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20%;
+}
+
+.start-game-container button {
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    border-radius: 0.5rem;
+    background-color: rgb(40, 40, 40);
+    color: white;
+
+    transition: background-color 0.3s;
+}
+
+.start-game-container button:hover {
+    background-color: rgb(0, 0, 0);
 }
