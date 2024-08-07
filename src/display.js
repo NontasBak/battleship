@@ -244,7 +244,7 @@ class Display {
         }
     }
 
-    cellClickHandler(e) {
+    async cellClickHandler(e) {
         const x = e.target.dataset.x;
         const y = e.target.dataset.y;
 
@@ -268,6 +268,8 @@ class Display {
 
             return [randomAttackX, randomAttackY];
         };
+
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         const playerBoard = this.player.gameBoard.board;
         let randomAttacks;
         let isAlreadyhit;
@@ -279,12 +281,7 @@ class Display {
                 isAlreadyhit = true;
                 continue;
             }
-            // if (!this.player.gameBoard.canReceiveAttack(...randomAttacks)) {
-            //     continue;
-            // }
-            // console.log(randomAttacks);
-            // console.log(playerBoard[randomAttacks[0]][randomAttacks[1]].ship);
-            // console.log(playerBoard[randomAttacks[0]][randomAttacks[1]].hit);
+            await wait(300);
             this.player.gameBoard.receiveAttack(...randomAttacks);
             this.displayBoardPlayer();
             if (this.player.gameBoard.allShipsSunk()) {
