@@ -5,15 +5,14 @@ class Display {
     constructor(player, computer) {
         this.player = player;
         this.computer = computer;
+        this.draggedShip = null;
 
         this.cellClickHandler = this.cellClickHandler.bind(this);
-
         this.dropHandler = this.dropHandler.bind(this);
         this.dragOverHandler = this.dragOverHandler.bind(this);
         this.dragStartHandler = this.dragStartHandler.bind(this);
         this.dragEndHandler = this.dragEndHandler.bind(this);
-        this.dragData = null;
-        this.validDragging = false;
+        this.dragEnterHandler = this.dragEnterHandler.bind(this);
     }
     displayBoardPlayer() {
         const board = this.player.gameBoard.board;
@@ -26,6 +25,9 @@ class Display {
                 cell.classList.add("cell");
                 cell.dataset.x = i;
                 cell.dataset.y = j;
+                cell.addEventListener("dragenter", this.dragEnterHandler);
+                cell.addEventListener("dragover", this.dragOverHandler);
+                cell.addEventListener("drop", this.dropHandler);
                 if (board[i][j].hit) {
                     cell.classList.add("hit");
                 }
@@ -49,35 +51,17 @@ class Display {
                 boardDiv.appendChild(cell);
             }
         }
-        if (document.body.classList.contains("starting-screen")) {
-            boardDiv.addEventListener("dragover", this.dragOverHandler);
-            boardDiv.addEventListener("drop", this.dropHandler);
-        } else {
-            boardDiv.removeEventListener("dragover", this.dragOverHandler);
-            boardDiv.removeEventListener("drop", this.dropHandler);
-        }
     }
 
     dragStartHandler(e) {
-        console.log("dragstart");
+        e.target.classList.add("dragging");
         const board = this.player.gameBoard.board;
-        const i = Number(e.target.dataset.x);
-        const j = Number(e.target.dataset.y);
-
-        e.dataTransfer.setData(
-            "text/plain",
-            board[i][j].ship.getShipDataJSON()
-        );
-        this.dragData = board[i][j].ship.getShipDataJSON();
+        const x = Number(e.target.dataset.x);
+        const y = Number(e.target.dataset.y);
+        this.draggedShip = board[x][y].ship;
 
         //Remove ship from old position
-        const oldShip = board[i][j].ship;
-        console.log(oldShip);
-        console.log(
-            document.querySelector(
-                `.cell[data-x="${oldShip.coordinates.x}"][data-y="${oldShip.coordinates.y + i}"]`
-            )
-        );
+        const oldShip = this.draggedShip;
         for (let i = 0; i < oldShip.length; i++) {
             if (oldShip.direction === "horizontal") {
                 document
@@ -103,40 +87,34 @@ class Display {
 
     dragOverHandler(e) {
         e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
+    }
+
+    dragEnterHandler(e) {
         const cells = document.querySelectorAll(".valid-move, .invalid-move");
         if (cells)
             cells.forEach((cell) =>
                 cell.classList.remove("valid-move", "invalid-move")
             );
-        console.log("dragover");
-        // console.log(e.dataTransfer.getData("text/plain"));
-        const data = this.dragData;
-        // console.log(data);
-        const shipData = JSON.parse(data);
-        if (!shipData) return;
-        const newShip = new Ship(shipData.length);
 
-        const targetCellX = Number(e.target.dataset.x);
-        const targetCellY = Number(e.target.dataset.y);
-        // console.log(targetCellX, targetCellY);
-        if (isNaN(targetCellX) || isNaN(targetCellY)) return;
+        const x = Number(e.target.dataset.x);
+        const y = Number(e.target.dataset.y);
 
         const cellsToMoveTo = [];
-        for (let i = 0; i < newShip.length; i++) {
-            if (shipData.direction === "horizontal") {
-                if (targetCellY + i < 10) {
+        if (!this.draggedShip) return;
+        for (let i = 0; i < this.draggedShip.length; i++) {
+            if (this.draggedShip.direction === "horizontal") {
+                if (y + i < 10) {
                     cellsToMoveTo.push(
                         document.querySelector(
-                            `.player .cell[data-x="${targetCellX}"][data-y="${targetCellY + i}"]`
+                            `.player .cell[data-x="${x}"][data-y="${y + i}"]`
                         )
                     );
                 }
             } else {
-                if (targetCellX + i < 10) {
+                if (x + i < 10) {
                     cellsToMoveTo.push(
                         document.querySelector(
-                            `.player .cell[data-x="${targetCellX + i}"][data-y="${targetCellY}"]`
+                            `.player .cell[data-x="${x + i}"][data-y="${y}"]`
                         )
                     );
                 }
@@ -145,10 +123,10 @@ class Display {
 
         if (
             this.player.gameBoard.canPlaceShip(
-                targetCellX,
-                targetCellY,
-                shipData.direction,
-                newShip
+                x,
+                y,
+                this.draggedShip.direction,
+                this.draggedShip
             )
         ) {
             cellsToMoveTo.forEach((cell) => {
@@ -163,83 +141,65 @@ class Display {
 
     dropHandler(e) {
         e.preventDefault();
-        this.validDragging = true;
+        if (document.querySelector(".dragging"))
+            document.querySelector(".dragging").classList.remove("dragging");
+
         const cells = document.querySelectorAll(".valid-move, .invalid-move");
         if (cells)
             cells.forEach((cell) =>
                 cell.classList.remove("valid-move", "invalid-move")
             );
 
-        const data = e.dataTransfer.getData("text/plain");
-        // console.log(data);
-        let shipData;
-        try {
-            shipData = JSON.parse(data);
-        } catch (err) {
-            this.dragData = null;
-            return;
-        }
-        const ship = new Ship(shipData.length);
-        // ship.coordinates = { x: i, y: j };
-        ship.direction = shipData.direction;
-        const targetCellX = Number(e.target.dataset.x);
-        const targetCellY = Number(e.target.dataset.y);
-        if (isNaN(targetCellX) || isNaN(targetCellY)) return;
-        // console.log(targetCellX, targetCellY);
-        if (
-            this.player.gameBoard.canPlaceShip(
-                targetCellX,
-                targetCellY,
-                ship.direction,
-                ship
-            )
-        ) {
-            this.player.gameBoard.placeShip(
-                targetCellX,
-                targetCellY,
-                ship.direction,
-                ship
-            );
+        if (!this.draggedShip) return;
+        const ship = new Ship(this.draggedShip.length);
+        ship.direction = this.draggedShip.direction;
+        const x = Number(e.target.dataset.x);
+        const y = Number(e.target.dataset.y);
+
+        if (this.player.gameBoard.canPlaceShip(x, y, ship.direction, ship)) {
+            this.player.gameBoard.placeShip(x, y, ship.direction, ship);
 
             //Remove ship from old position
             this.player.gameBoard.ships = this.player.gameBoard.ships.filter(
                 (sp) => {
-                    return (
-                        this.player.gameBoard.board[shipData.coordinates.x][
-                            shipData.coordinates.y
-                        ].ship !== sp
-                    );
+                    return this.draggedShip !== sp;
                 }
             );
         } else {
-            const oldShip = new Ship(shipData.length);
             this.player.gameBoard.placeShip(
-                shipData.coordinates.x,
-                shipData.coordinates.y,
-                shipData.direction,
-                oldShip
+                this.draggedShip.coordinates.x,
+                this.draggedShip.coordinates.y,
+                this.draggedShip.direction,
+                this.draggedShip
             );
         }
+        this.draggedShip = null;
         this.displayBoardPlayer();
     }
 
     dragEndHandler(e) {
-        // console.log(this.validDragging);
-        if (this.validDragging) return;
+        if (e.target.classList.contains("dragging")) {
+            e.target.classList.remove("dragging");
 
-        console.log("dragend");
-        const data = this.dragData;
-        const shipData = JSON.parse(data);
-        const oldShip = new Ship(shipData.length);
-        this.player.gameBoard.placeShip(
-            shipData.coordinates.x,
-            shipData.coordinates.y,
-            shipData.direction,
-            oldShip
-        );
-        this.dragData = null;
-        this.validDragging = false;
-        this.displayBoardPlayer();
+            const x = Number(e.target.dataset.x);
+            const y = Number(e.target.dataset.y);
+
+            this.player.gameBoard.ships = this.player.gameBoard.ships.filter(
+                (sp) => {
+                    return this.draggedShip !== sp;
+                }
+            );
+
+            const oldShip = new Ship(this.draggedShip.length);
+            this.player.gameBoard.placeShip(
+                x,
+                y,
+                this.draggedShip.direction,
+                oldShip
+            );
+            this.draggedShip = null;
+            this.displayBoardPlayer();
+        }
     }
 
     displayBoardComputer() {
