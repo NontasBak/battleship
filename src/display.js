@@ -37,6 +37,7 @@ class Display {
                         cell.classList.add("sunk");
                     }
                     if (document.body.classList.contains("starting-screen")) {
+                        cell.classList.add("movable");
                         cell.draggable = true;
                         cell.addEventListener(
                             "dragstart",
@@ -68,7 +69,7 @@ class Display {
                     .querySelector(
                         `.cell[data-x="${oldShip.coordinates.x}"][data-y="${oldShip.coordinates.y + i}"]`
                     )
-                    .classList.remove("ship");
+                    .classList.remove("ship", "movable");
                 this.player.gameBoard.board[oldShip.coordinates.x][
                     oldShip.coordinates.y + i
                 ].ship = null;
@@ -77,7 +78,7 @@ class Display {
                     .querySelector(
                         `.cell[data-x="${oldShip.coordinates.x + i}"][data-y="${oldShip.coordinates.y}"]`
                     )
-                    .classList.remove("ship");
+                    .classList.remove("ship", "movable");
                 this.player.gameBoard.board[oldShip.coordinates.x + i][
                     oldShip.coordinates.y
                 ].ship = null;
