@@ -23,15 +23,20 @@ class GameBoard {
         }
 
         this.ships.push(ship);
+        ship.direction = direction;
+        ship.coordinates = { x, y };
+        // console.log(x, y, direction, ship);
         switch (direction) {
             case "horizontal":
                 for (let i = 0; i < ship.length; i++) {
                     this.board[x][y + i].ship = ship;
+                    // ship.coordinates.push({ x: x, y: y + i });
                 }
                 break;
             case "vertical":
                 for (let i = 0; i < ship.length; i++) {
                     this.board[x + i][y].ship = ship;
+                    // ship.coordinates.push({ x: x + i, y: y });
                 }
                 break;
         }
@@ -63,6 +68,7 @@ class GameBoard {
             for (let i = 0; i < ship.length; i++)
                 if (this.board[x][y + i].ship) return false;
         } else if (direction === "vertical") {
+            // console.log(this.board.length, x, ship.length);
             if (this.board.length < x + ship.length) return false;
             for (let i = 0; i < ship.length; i++)
                 if (this.board[x + i][y].ship) return false;
@@ -138,7 +144,8 @@ class GameBoard {
         const ship8 = new Ship(3);
         const ship9 = new Ship(3);
         const ship10 = new Ship(4);
-        this.ships.push(
+        const shipsToPlace = [];
+        shipsToPlace.push(
             ship1,
             ship2,
             ship3,
@@ -151,7 +158,7 @@ class GameBoard {
             ship10
         );
 
-        this.ships.forEach((ship) => {
+        shipsToPlace.forEach((ship) => {
             let randomPosition;
             do {
                 randomPosition = getRandomPosition();

@@ -7,6 +7,13 @@ class Display {
         this.computer = computer;
 
         this.cellClickHandler = this.cellClickHandler.bind(this);
+
+        this.dropHandler = this.dropHandler.bind(this);
+        this.dragOverHandler = this.dragOverHandler.bind(this);
+        this.dragStartHandler = this.dragStartHandler.bind(this);
+        this.dragEndHandler = this.dragEndHandler.bind(this);
+        this.dragData = null;
+        this.validDragging = false;
     }
     displayBoardPlayer() {
         const board = this.player.gameBoard.board;
@@ -27,12 +34,212 @@ class Display {
                     if (board[i][j].ship.isSunk) {
                         cell.classList.add("sunk");
                     }
+                    if (document.body.classList.contains("starting-screen")) {
+                        cell.draggable = true;
+                        cell.addEventListener(
+                            "dragstart",
+                            this.dragStartHandler
+                        );
+                        cell.addEventListener("dragend", this.dragEndHandler);
+                    }
                 } else {
                     cell.classList.add("water");
                 }
+
                 boardDiv.appendChild(cell);
             }
         }
+        if (document.body.classList.contains("starting-screen")) {
+            boardDiv.addEventListener("dragover", this.dragOverHandler);
+            boardDiv.addEventListener("drop", this.dropHandler);
+        } else {
+            boardDiv.removeEventListener("dragover", this.dragOverHandler);
+            boardDiv.removeEventListener("drop", this.dropHandler);
+        }
+    }
+
+    dragStartHandler(e) {
+        console.log("dragstart");
+        const board = this.player.gameBoard.board;
+        const i = Number(e.target.dataset.x);
+        const j = Number(e.target.dataset.y);
+
+        e.dataTransfer.setData(
+            "text/plain",
+            board[i][j].ship.getShipDataJSON()
+        );
+        this.dragData = board[i][j].ship.getShipDataJSON();
+
+        //Remove ship from old position
+        const oldShip = board[i][j].ship;
+        console.log(oldShip);
+        console.log(
+            document.querySelector(
+                `.cell[data-x="${oldShip.coordinates.x}"][data-y="${oldShip.coordinates.y + i}"]`
+            )
+        );
+        for (let i = 0; i < oldShip.length; i++) {
+            if (oldShip.direction === "horizontal") {
+                document
+                    .querySelector(
+                        `.cell[data-x="${oldShip.coordinates.x}"][data-y="${oldShip.coordinates.y + i}"]`
+                    )
+                    .classList.remove("ship");
+                this.player.gameBoard.board[oldShip.coordinates.x][
+                    oldShip.coordinates.y + i
+                ].ship = null;
+            } else {
+                document
+                    .querySelector(
+                        `.cell[data-x="${oldShip.coordinates.x + i}"][data-y="${oldShip.coordinates.y}"]`
+                    )
+                    .classList.remove("ship");
+                this.player.gameBoard.board[oldShip.coordinates.x + i][
+                    oldShip.coordinates.y
+                ].ship = null;
+            }
+        }
+    }
+
+    dragOverHandler(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        const cells = document.querySelectorAll(".valid-move, .invalid-move");
+        if (cells)
+            cells.forEach((cell) =>
+                cell.classList.remove("valid-move", "invalid-move")
+            );
+        console.log("dragover");
+        // console.log(e.dataTransfer.getData("text/plain"));
+        const data = this.dragData;
+        // console.log(data);
+        const shipData = JSON.parse(data);
+        if (!shipData) return;
+        const newShip = new Ship(shipData.length);
+
+        const targetCellX = Number(e.target.dataset.x);
+        const targetCellY = Number(e.target.dataset.y);
+        // console.log(targetCellX, targetCellY);
+        if (isNaN(targetCellX) || isNaN(targetCellY)) return;
+
+        const cellsToMoveTo = [];
+        for (let i = 0; i < newShip.length; i++) {
+            if (shipData.direction === "horizontal") {
+                if (targetCellY + i < 10) {
+                    cellsToMoveTo.push(
+                        document.querySelector(
+                            `.player .cell[data-x="${targetCellX}"][data-y="${targetCellY + i}"]`
+                        )
+                    );
+                }
+            } else {
+                if (targetCellX + i < 10) {
+                    cellsToMoveTo.push(
+                        document.querySelector(
+                            `.player .cell[data-x="${targetCellX + i}"][data-y="${targetCellY}"]`
+                        )
+                    );
+                }
+            }
+        }
+
+        if (
+            this.player.gameBoard.canPlaceShip(
+                targetCellX,
+                targetCellY,
+                shipData.direction,
+                newShip
+            )
+        ) {
+            cellsToMoveTo.forEach((cell) => {
+                cell.classList.add("valid-move");
+            });
+        } else {
+            cellsToMoveTo.forEach((cell) => {
+                cell.classList.add("invalid-move");
+            });
+        }
+    }
+
+    dropHandler(e) {
+        e.preventDefault();
+        this.validDragging = true;
+        const cells = document.querySelectorAll(".valid-move, .invalid-move");
+        if (cells)
+            cells.forEach((cell) =>
+                cell.classList.remove("valid-move", "invalid-move")
+            );
+
+        const data = e.dataTransfer.getData("text/plain");
+        // console.log(data);
+        let shipData;
+        try {
+            shipData = JSON.parse(data);
+        } catch (err) {
+            this.dragData = null;
+            return;
+        }
+        const ship = new Ship(shipData.length);
+        // ship.coordinates = { x: i, y: j };
+        ship.direction = shipData.direction;
+        const targetCellX = Number(e.target.dataset.x);
+        const targetCellY = Number(e.target.dataset.y);
+        if (isNaN(targetCellX) || isNaN(targetCellY)) return;
+        // console.log(targetCellX, targetCellY);
+        if (
+            this.player.gameBoard.canPlaceShip(
+                targetCellX,
+                targetCellY,
+                ship.direction,
+                ship
+            )
+        ) {
+            this.player.gameBoard.placeShip(
+                targetCellX,
+                targetCellY,
+                ship.direction,
+                ship
+            );
+
+            //Remove ship from old position
+            this.player.gameBoard.ships = this.player.gameBoard.ships.filter(
+                (sp) => {
+                    return (
+                        this.player.gameBoard.board[shipData.coordinates.x][
+                            shipData.coordinates.y
+                        ].ship !== sp
+                    );
+                }
+            );
+        } else {
+            const oldShip = new Ship(shipData.length);
+            this.player.gameBoard.placeShip(
+                shipData.coordinates.x,
+                shipData.coordinates.y,
+                shipData.direction,
+                oldShip
+            );
+        }
+        this.displayBoardPlayer();
+    }
+
+    dragEndHandler(e) {
+        // console.log(this.validDragging);
+        if (this.validDragging) return;
+
+        console.log("dragend");
+        const data = this.dragData;
+        const shipData = JSON.parse(data);
+        const oldShip = new Ship(shipData.length);
+        this.player.gameBoard.placeShip(
+            shipData.coordinates.x,
+            shipData.coordinates.y,
+            shipData.direction,
+            oldShip
+        );
+        this.dragData = null;
+        this.validDragging = false;
+        this.displayBoardPlayer();
     }
 
     displayBoardComputer() {
@@ -158,6 +365,7 @@ class Display {
     }
 
     startingScreen() {
+        document.body.classList.add("starting-screen");
         this.player.gameBoard.placeShipRandomly();
         this.computer.gameBoard.placeShipRandomly();
         this.displayBoardPlayer();
@@ -178,6 +386,8 @@ class Display {
         startGameButton.classList.add("start");
         startGameButton.textContent = "Start";
         startGameButton.addEventListener("click", () => {
+            document.body.classList.remove("starting-screen");
+            this.displayBoardPlayer();
             this.displayBoardComputer();
             // startGameContainer.style.display = "none";
             startGameContainer.remove();
